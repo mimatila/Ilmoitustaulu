@@ -85,10 +85,17 @@ function loadMessage() {
       const box = document.getElementById("message");
       box.innerHTML = "";
 
+      /*
       (data.messages || []).forEach(msg => {
         const p = document.createElement("p");
         p.innerText = msg;
         box.appendChild(p);
+      });*/
+
+      (data.messages || []).forEach(msg => {
+      const p = document.createElement("p");
+      p.innerText = `${msg.time}: ${msg.text}`;
+      box.appendChild(p);
       });
 
     });

@@ -138,7 +138,12 @@ app.post("/message", (req, res) => {
   }
 
   // 🔥 TÄMÄ PITÄÄ OLLA ENNEN RESPONSEA
-  data[name].messages.push(message);
+  //data[name].messages.push(message);
+
+  data[name].messages.push({
+  time: new Date().toLocaleString(),
+  text: message
+  });
 
   fs.writeFileSync(
     FILE,
@@ -167,6 +172,11 @@ app.get("/board/:name", (req, res) => {
   }
 
   res.json(board);
+});
+
+app.get("/boards", (req, res) => {
+  const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
+  res.json(data);
 });
 
 app.listen(3000, () => {
