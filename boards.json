@@ -1,6 +1,17 @@
 {
   "Virtaset": {
     "password": "1234",
-    "message": ""
+    "messages": []
+  },
+  "T": {
+    "password": "2222",
+    "messages": [
+      "test",
+      "test2",
+      "mika",
+      "opa",
+      "mika",
+      "test"
+    ]
   }
 }

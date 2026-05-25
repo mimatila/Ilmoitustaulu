@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
+const ADMIN_PASSWORD = "1234";
 
 const app = express();
 
@@ -16,43 +17,156 @@ if (!fs.existsSync(FILE)) {
   fs.writeFileSync(FILE, "{}");
 }
 
-app.post("/create", (req, res) => {
+app.post("/login", (req, res) => {
+
   const { name, password } = req.body;
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
+  if (!data[name]) {
+    return res.status(404).json({
+      success: false,
+      message: "Taulua ei löydy"
+    });
+  }
+
+  if (data[name].password !== password) {
+    return res.status(401).json({
+      success: false,
+      message: "Väärä salasana"
+    });
+  }
+
+  // 👍 onnistui
+  res.status(200).json({
+    success: true
+  });
+
+});
+
+app.post("/create", (req, res) => {
+
+  const { name, password, adminPassword } = req.body;
+
+  // 🔥 tarkista admin salasana
+  if (adminPassword !== ADMIN_PASSWORD) {
+    return res.status(401).json({
+      success: false,
+      message: "Ei oikeuksia luoda taulua"
+    });
+  }
+
+  const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
+
+  if (data[name]) {
+    return res.status(400).json({
+      success: false,
+      message: "Taulu on jo olemassa"
+    });
+  }
+
   data[name] = {
-    password,
-    message: ""
+  password,
+  messages: []
   };
 
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 
-  res.send("Taulu luotu");
-});
+  res.json({
+    success: true,
+    message: "Taulu luotu"
+  });
 
-  app.get("/boards", (req, res) => {
-  const data = JSON.parse(fs.readFileSync("boards.json", "utf8"));
-  res.json(data);
 });
 
 app.delete("/delete/:name", (req, res) => {
+
   const name = req.params.name;
+  const { password } = req.body;
+
+  const data = JSON.parse(
+    fs.readFileSync(FILE, "utf8")
+  );
+
+  // löytyykö taulu
+  if (!data[name]) {
+    return res.status(404).json({
+    success: false,
+    message: "Taulua ei löytynyt"
+  });
+  }
+
+  // tarkista salasana
+  if (data[name].password !== password) {
+    return res.status(401).json({
+    success: false,
+    message: "Väärä salasana"
+  });
+  }
+
+  delete data[name];
+
+  fs.writeFileSync(
+    FILE,
+    JSON.stringify(data, null, 2)
+  );
+
+  res.json({ success: true, message: "Taulu poistettu" });
+
+});
+
+app.post("/message", (req, res) => {
+
+  const { name, password, message } = req.body;
+
+  const data = JSON.parse(
+    fs.readFileSync(FILE, "utf8")
+  );
+
+  if (!data[name]) {
+    return res.status(404).json({
+      success: false,
+      message: "Taulua ei löydy"
+    });
+  }
+
+  if (data[name].password !== password) {
+    return res.status(401).json({
+      success: false,
+      message: "Väärä salasana"
+    });
+  }
+
+  // 🔥 TÄMÄ PITÄÄ OLLA ENNEN RESPONSEA
+  data[name].messages.push(message);
+
+  fs.writeFileSync(
+    FILE,
+    JSON.stringify(data, null, 2)
+  );
+
+  res.json({ success: true, message: "Viesti tallennettu" });
+
+});
+
+app.get("/favicon.ico", (req, res) => {
+  res.status(204).end();
+});
+
+app.get("/board/:name", (req, res) => {
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
-  // tarkista löytyykö
-  if (!data[name]) {
-    return res.status(404).send("Taulua ei löytynyt");
+  const board = data[req.params.name];
+
+  if (!board) {
+    return res.status(404).json({
+      success: false,
+      message: "Taulua ei löydy"
+    });
   }
 
-  // poista
-  delete data[name];
-
-  // tallenna takaisin
-  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
-
-  res.send("Taulu poistettu");
+  res.json(board);
 });
 
 app.listen(3000, () => {
