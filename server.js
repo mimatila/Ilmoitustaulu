@@ -19,7 +19,9 @@ if (!fs.existsSync(FILE)) {
 
 app.post("/login", (req, res) => {
 
-  const { name, password } = req.body;
+   console.log("REQ BODY:", req.body);
+
+  const { name, password, user } = req.body;
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
@@ -36,6 +38,14 @@ app.post("/login", (req, res) => {
       message: "Väärä salasana"
     });
   }
+
+ 
+  console.log("USER HERE:", user);
+  if (!data[name].members.includes(user)) {
+  data[name].members.push(user);
+
+  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
+}
 
   // 👍 onnistui
   res.status(200).json({
@@ -65,10 +75,18 @@ app.post("/create", (req, res) => {
     });
   }
 
+  /*
   data[name] = {
   password,
   messages: []
-  };
+  };*/
+
+  data[name] = {
+  password,
+  owner: name,
+  members: [name],
+  messages: []
+};
 
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 
@@ -117,7 +135,7 @@ app.delete("/delete/:name", (req, res) => {
 
 app.post("/message", (req, res) => {
 
-  const { name, password, message } = req.body;
+  const { name, password, message, user } = req.body;
 
   const data = JSON.parse(
     fs.readFileSync(FILE, "utf8")
@@ -141,6 +159,7 @@ app.post("/message", (req, res) => {
   //data[name].messages.push(message);
 
   data[name].messages.push({
+  author: user,
   time: new Date().toLocaleString(),
   text: message
   });

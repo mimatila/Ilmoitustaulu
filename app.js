@@ -1,16 +1,24 @@
 // LOGIN
-if (document.getElementById("liity")) {
-  document.getElementById("liity").addEventListener("click", loginBoard);
+if (document.getElementById("ilmoitustaulu")) {
+  document.getElementById("ilmoitustaulu").addEventListener("click", loginBoard);
 }
 
+if (document.getElementById("koti")) {
+  document.getElementById("koti").addEventListener("click", koti);
+}
+
+
+
 function loginBoard() {
+  
   const name = document.getElementById("name").value;
   const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value;
 
   fetch("http://localhost:3000/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, password })
+    body: JSON.stringify({ name, password, user: username })
   })
   .then(res => res.json())
   .then(data => {
@@ -18,9 +26,16 @@ function loginBoard() {
 
     localStorage.setItem("boardName", name);
     localStorage.setItem("boardPassword", password);
-    window.location.href = "board.html";
+    localStorage.setItem("username", username);
+    //window.location.href = "board.html";
+    window.open("board.html", "_blank");
   });
 }
+
+function koti() {
+  window.location.href = "index.html";
+} 
+
 
 function createBoard() {
   const name = document.getElementById("name").value;
@@ -34,7 +49,14 @@ function createBoard() {
     body: JSON.stringify({ name, password, adminPassword })
   })
   .then(res => res.json())
-  .then(data => alert(data.message));
+  .then(data => {
+
+  document.getElementById("name").value = "";
+  document.getElementById("password").value = "";
+
+  alert(data.message);
+
+});
 }
 
 function deleteBoard() {
@@ -53,7 +75,12 @@ function deleteBoard() {
       return alert(data.message || "Virhe");
     }
 
+     // 🔥 tyhjennä kentät
+    document.getElementById("name").value = "";
+    document.getElementById("password").value = "";
+
     alert(data.message);
+
   });
 }
 
@@ -94,7 +121,7 @@ function loadMessage() {
 
       (data.messages || []).forEach(msg => {
       const p = document.createElement("p");
-      p.innerText = `${msg.time}: ${msg.text}`;
+      p.innerText = `${msg.time} - ${msg.author}: ${msg.text}`;
       box.appendChild(p);
       });
 
@@ -104,10 +131,14 @@ function loadMessage() {
 
   window.updateMessage = function () {
 
+  console.log("UPDATE MESSAGE KUTSUTAAN");
   const message = document.getElementById("newMsg").value;
 
   const name = localStorage.getItem("boardName");
   const password = localStorage.getItem("boardPassword");
+  const user = localStorage.getItem("username") || name;
+
+  console.log("LOGIN KUTSUTAAN");
 
   fetch("http://localhost:3000/message", {
     method: "POST",
@@ -115,7 +146,8 @@ function loadMessage() {
     body: JSON.stringify({
       name,
       password,
-      message
+      message,
+      user
     })
   })
   .then(res => res.json())

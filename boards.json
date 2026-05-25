@@ -1,26 +1,32 @@
 {
-  "T": {
-    "password": "22",
+  "Mika": {
+    "password": "1",
+    "owner": "Mika",
+    "members": [
+      "Mika",
+      "Sammy",
+      ""
+    ],
     "messages": [
       {
-        "time": "5/25/2026, 12:31:54 PM",
-        "text": "mika"
-      },
-      {
-        "time": "5/25/2026, 12:32:00 PM",
+        "author": "heppu",
+        "time": "5/25/2026, 5:12:31 PM",
         "text": "terve"
       },
       {
-        "time": "5/25/2026, 12:35:42 PM",
-        "text": "hep"
+        "author": "Sammy",
+        "time": "5/25/2026, 5:45:11 PM",
+        "text": "heu"
       },
       {
-        "time": "5/25/2026, 12:35:51 PM",
-        "text": "hhhhaha"
+        "author": "Sammy",
+        "time": "5/25/2026, 5:50:10 PM",
+        "text": "terve"
       },
       {
-        "time": "5/25/2026, 12:35:56 PM",
-        "text": "kkdkdkdkdk"
+        "author": "Mika",
+        "time": "5/25/2026, 6:21:17 PM",
+        "text": "hey"
       }
     ]
   }
