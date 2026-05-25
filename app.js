@@ -40,13 +40,14 @@ function koti() {
 function createBoard() {
   const name = document.getElementById("name").value;
   const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value;
 
   const adminPassword = prompt("Anna admin-salasana:");
 
   fetch("http://localhost:3000/create", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, password, adminPassword })
+    body: JSON.stringify({ name, password, username, adminPassword })
   })
   .then(res => res.json())
   .then(data => {

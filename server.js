@@ -19,7 +19,7 @@ if (!fs.existsSync(FILE)) {
 
 app.post("/login", (req, res) => {
 
-   console.log("REQ BODY:", req.body);
+  //console.log("REQ BODY:", req.body);
 
   const { name, password, user } = req.body;
 
@@ -39,10 +39,10 @@ app.post("/login", (req, res) => {
     });
   }
 
- 
-  console.log("USER HERE:", user);
-  if (!data[name].members.includes(user)) {
+  if (!data[name].members.includes(user)&&user!=null&&user!="") {
   data[name].members.push(user);
+
+  console.log("MEMBERS HERE:", data[name].members);
 
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 }
@@ -56,8 +56,8 @@ app.post("/login", (req, res) => {
 
 app.post("/create", (req, res) => {
 
-  const { name, password, adminPassword } = req.body;
-
+  const { name, password, username, adminPassword } = req.body;
+  console.log(req.body);
   // 🔥 tarkista admin salasana
   if (adminPassword !== ADMIN_PASSWORD) {
     return res.status(401).json({
@@ -83,8 +83,8 @@ app.post("/create", (req, res) => {
 
   data[name] = {
   password,
-  owner: name,
-  members: [name],
+  owner: username,
+  members: [username],
   messages: []
 };
 
