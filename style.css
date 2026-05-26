@@ -24,7 +24,52 @@ button {
 .board {
   border: 2px solid black;
   margin: 20px auto;
-  width: 300px;
+  width: 600px;
   min-height: 150px;
   padding: 10px;
+}
+
+#message {
+  height: 200px;
+  overflow-y: auto;
+  overflow-x: auto;
+  display: block;
+
+  font-family: monospace;
+  text-align: left;
+
+  padding: 12px;
+
+  border: 1px solid #ccc;
+  border-radius: 10px;
+
+  background: #f7f7f7;
+
+  font-size: 15px;
+
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+#message div {
+  margin: 6px 0;
+  padding: 8px 10px;
+
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  max-width: 90%;
+
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.input-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  max-width: 500px;
+  margin: 0 auto;   /* 🔥 keskittää vaakasuunnassa */
+}
+
+#newMsg {
+  flex: 1;
 }

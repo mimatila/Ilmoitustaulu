@@ -3,20 +3,18 @@
     "password": "1",
     "owner": "Opa",
     "members": [
-      "Opa",
-      "tuina",
-      "salami"
+      "Opa"
     ],
     "messages": [
       {
         "author": "Opa",
-        "time": "5/25/2026, 8:31:09 PM",
-        "text": "hey"
+        "time": "5/26/2026, 8:46:57 PM",
+        "text": "täällä mennään"
       },
       {
-        "author": "tuina",
-        "time": "5/25/2026, 8:32:06 PM",
-        "text": "hey"
+        "author": "Mika",
+        "time": "5/26/2026, 8:56:31 PM",
+        "text": "terve"
       }
     ]
   }

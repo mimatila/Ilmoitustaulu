@@ -92,42 +92,31 @@ if (document.getElementById("boardName")) {
 
   document.getElementById("boardName").innerText = boardName;
 
-function loadMessage() {
+function loadMessage(forceScroll = false) {
+
+  const box = document.getElementById("message");
 
   fetch(`http://localhost:3000/board/${boardName}`)
-    .then(async res => {
-
-      const data = await res.json().catch(() => null);
-
-      if (!res.ok) {
-        alert(data?.message || "Virhe haussa");
-        return;
-      }
-
-      return data;
-    })
+    .then(res => res.json())
     .then(data => {
 
-      if (!data) return;
+      const isAtBottom =
+        box.scrollTop + box.clientHeight >= box.scrollHeight - 10;
 
-      const box = document.getElementById("message");
       box.innerHTML = "";
 
-      /*
       (data.messages || []).forEach(msg => {
-        const p = document.createElement("p");
-        p.innerText = msg;
-        box.appendChild(p);
-      });*/
-
-      (data.messages || []).forEach(msg => {
-      const p = document.createElement("p");
-      p.innerText = `${msg.time} - ${msg.author}: ${msg.text}`;
-      box.appendChild(p);
+        const div = document.createElement("div");
+        div.innerText = `${msg.time} - ${msg.author}: ${msg.text}`;
+        box.appendChild(div);
       });
 
-    });
+      // 🔥 nyt oikein
+      if (forceScroll || isAtBottom) {
+        box.scrollTop = box.scrollHeight;
+      }
 
+    });
 }
 
   window.updateMessage = function () {
@@ -155,12 +144,13 @@ function loadMessage() {
   .then(data => {
   if (!data.success) return alert(data.message);
 
-  loadMessage();
+  loadMessage(true);
 
   document.getElementById("newMsg").value = "";
+  
 });
   
 }
-loadMessage();
+  loadMessage();
   
 }
