@@ -23,14 +23,18 @@ button {
 
 .board {
   border: 2px solid black;
-  margin: 20px auto;
-  width: 600px;
+  margin: 0 auto;
+  max-width: 600px;
   min-height: 150px;
   padding: 10px;
 }
 
 #message {
   height: 200px;
+  max-width: 550px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
   overflow-y: auto;
   overflow-x: auto;
   display: block;
@@ -53,6 +57,9 @@ button {
 #message div {
   margin: 6px 0;
   padding: 8px 10px;
+
+  white-space: normal;
+  overflow-wrap: break-word;
 
   background: #ffffff;
   border-radius: 10px;
