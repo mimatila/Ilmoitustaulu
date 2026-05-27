@@ -38,7 +38,6 @@ if (document.getElementById("name")) {
 });
 }
 
-
 function loginBoard() {
 
   const name = document.getElementById("name").value;
@@ -211,3 +210,10 @@ function loadMessage(forceScroll = false) {
   loadMessage();
   
 }
+
+document.getElementById("newMsg").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") {
+    e.preventDefault(); // estää rivinvaihdon
+    updateMessage();
+  }
+});
