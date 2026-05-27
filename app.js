@@ -7,10 +7,40 @@ if (document.getElementById("koti")) {
   document.getElementById("koti").addEventListener("click", koti);
 }
 
+if (document.getElementById("name")) {
+
+ window.addEventListener("DOMContentLoaded", () => {
+
+  const name = localStorage.getItem("boardName") || "";
+  const password = localStorage.getItem("boardPassword") || "";
+  const username = localStorage.getItem("username") || "";
+
+  const loggedIn = localStorage.getItem("loggedIn");
+  const skip = sessionStorage.getItem("skipAutoLogin");
+
+  // 🔥 AUTLOGIN
+  if (!skip && loggedIn === "true") {
+    window.location.href = "board.html";
+    return;
+  }
+
+  sessionStorage.removeItem("skipAutoLogin");
+
+  // 🔥 TÄYTTÖ AINA (tämä on tärkein osa)
+  const nameInput = document.getElementById("name");
+  const passwordInput = document.getElementById("password");
+  const usernameInput = document.getElementById("username");
+
+  if (nameInput) nameInput.value = name;
+  if (passwordInput) passwordInput.value = password;
+  if (usernameInput) usernameInput.value = username;
+
+});
+}
 
 
 function loginBoard() {
-  
+
   const name = document.getElementById("name").value;
   const password = document.getElementById("password").value;
   const username = document.getElementById("username").value;
@@ -27,15 +57,26 @@ function loginBoard() {
     localStorage.setItem("boardName", name);
     localStorage.setItem("boardPassword", password);
     localStorage.setItem("username", username);
-    //window.location.href = "board.html";
-    window.open("board.html", "_blank");
+
+    localStorage.setItem("loggedIn", "true");
+
+    window.location.href = "board.html";
   });
 }
 
 function koti() {
+  sessionStorage.setItem("skipAutoLogin", "1");
   window.location.href = "index.html";
-} 
+}
 
+function logout() {
+  localStorage.removeItem("boardName");
+  localStorage.removeItem("boardPassword");
+  localStorage.removeItem("username");
+  localStorage.removeItem("loggedIn");
+
+  window.location.href = "index.html";
+}
 
 function createBoard() {
   const name = document.getElementById("name").value;
@@ -52,8 +93,13 @@ function createBoard() {
   .then(res => res.json())
   .then(data => {
 
+  localStorage.setItem("boardName", name);
+  localStorage.setItem("boardPassword", password);
+  localStorage.setItem("username", username);
+
   document.getElementById("name").value = "";
   document.getElementById("password").value = "";
+  document.getElementById("username").value = "";
 
   alert(data.message);
 
@@ -61,6 +107,9 @@ function createBoard() {
 }
 
 function deleteBoard() {
+
+  if (!confirm("Haluatko varmasti poistaa taulun?")) return;
+  
   const name = document.getElementById("name").value;
   const password = document.getElementById("password").value;
 
@@ -76,12 +125,20 @@ function deleteBoard() {
       return alert(data.message || "Virhe");
     }
 
-     // 🔥 tyhjennä kentät
+    // 🔥 tyhjennä inputit
     document.getElementById("name").value = "";
     document.getElementById("password").value = "";
+    document.getElementById("username").value = "";
+
+    // 🔥 tyhjennä localStorage (TÄRKEÄ)
+    localStorage.removeItem("boardName");
+    localStorage.removeItem("boardPassword");
+    localStorage.removeItem("username");
 
     alert(data.message);
 
+    // (valinnainen mutta hyvä)
+    // window.location.href = "index.html";
   });
 }
 
