@@ -18,6 +18,20 @@ if (document.getElementById("name")) {
   const loggedIn = localStorage.getItem("loggedIn");
   const skip = sessionStorage.getItem("skipAutoLogin");
 
+   const btn = document.getElementById("ilmoitustaulu");
+
+  if (btn) {
+  btn.addEventListener("click", loginBoard);
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      btn.click();
+    }
+  }, { once: false });
+}
+
+  console.log("voiovoi: ", btn);
+
   // 🔥 AUTLOGIN
   if (!skip && loggedIn === "true") {
     window.location.href = "board.html";
@@ -217,3 +231,4 @@ document.getElementById("newMsg").addEventListener("keydown", function (e) {
     updateMessage();
   }
 });
+
