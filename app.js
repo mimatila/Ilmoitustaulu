@@ -3,9 +3,30 @@ if (document.getElementById("ilmoitustaulu")) {
   document.getElementById("ilmoitustaulu").addEventListener("click", loginBoard);
 }
 
+
 if (document.getElementById("koti")) {
   document.getElementById("koti").addEventListener("click", koti);
 }
+
+document.getElementById("todayMode")
+?.addEventListener("change", () => {
+  loadMessage();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const el = document.getElementById("newMsg");
+
+  if (!el) return;
+
+  el.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      updateMessage();
+    }
+  });
+
+});
 
 if (document.getElementById("name")) {
 
@@ -173,15 +194,32 @@ function loadMessage(forceScroll = false) {
       const isAtBottom =
         box.scrollTop + box.clientHeight >= box.scrollHeight - 10;
 
+      const todayMode =
+        document.getElementById("todayMode")?.checked;
+
+      const today = new Date().toLocaleDateString();
+
       box.innerHTML = "";
 
       (data.messages || []).forEach(msg => {
+
         const div = document.createElement("div");
-        div.innerText = `${msg.time} - ${msg.author}: ${msg.text}`;
+
+        const date = new Date(msg.time);
+        const msgDate = date.toLocaleDateString();
+
+        // 🔥 checkbox EI suodata mitään, vain muoto
+        if (todayMode && msgDate === today) {
+          div.innerText =
+            `Tänään - ${msg.author}: ${msg.text}`;
+        } else {
+          div.innerText =
+            `${date.toLocaleString()} - ${msg.author}: ${msg.text}`;
+        }
+
         box.appendChild(div);
       });
 
-      // 🔥 nyt oikein
       if (forceScroll || isAtBottom) {
         box.scrollTop = box.scrollHeight;
       }
@@ -225,10 +263,30 @@ function loadMessage(forceScroll = false) {
   
 }
 
-document.getElementById("newMsg").addEventListener("keydown", function (e) {
-  if (e.key === "Enter") {
-    e.preventDefault(); // estää rivinvaihdon
-    updateMessage();
-  }
-});
+function clearTable() {
+
+  if (!confirm("Tyhjennetäänkö kaikki viestit?")) return;
+
+  const adminPassword = prompt("Anna admin-salasana:");
+
+  if (!adminPassword) return;
+
+  const name = localStorage.getItem("boardName");
+
+  fetch(`http://localhost:3000/clear/${name}`, {
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ adminPassword })
+  })
+  .then(res => res.json())
+  .then(data => {
+
+    alert(data.message);
+
+    if (data.success) {
+      loadMessage(true);
+    }
+
+  });
+}
 

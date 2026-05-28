@@ -160,7 +160,7 @@ app.post("/message", (req, res) => {
 
   data[name].messages.push({
   author: user,
-  time: new Date().toLocaleString(),
+  time: new Date().toISOString(),
   text: message
   });
 
@@ -196,6 +196,46 @@ app.get("/board/:name", (req, res) => {
 app.get("/boards", (req, res) => {
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
   res.json(data);
+});
+
+app.delete("/clear/:name", (req, res) => {
+
+  const data = JSON.parse(
+    fs.readFileSync(FILE, "utf8")
+  );
+
+  const { adminPassword } = req.body;
+
+  if (adminPassword !== ADMIN_PASSWORD) {
+    return res.status(403).json({
+      success: false,
+      message: "Väärä admin-salasana"
+    });
+  }
+
+  const board = data[req.params.name];
+
+  if (!board) {
+    return res.status(404).json({
+      success: false,
+      message: "Taulua ei löytynyt"
+    });
+  }
+
+  // 🔥 tyhjennä viestit
+  board.messages = [];
+
+  // 🔥 tallenna JSONiin
+  fs.writeFileSync(
+    FILE,
+    JSON.stringify(data, null, 2)
+  );
+
+  res.json({
+    success: true,
+    message: "Viestit tyhjennetty"
+  });
+
 });
 
 app.listen(3000, () => {

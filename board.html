@@ -15,8 +15,15 @@
   <input id="newMsg" placeholder="Kirjoita uusi viesti">
   <button onclick="updateMessage()">Päivitä</button>
 </div>
+<div class="output-row">
 <input id="koti" type="button" value="Koti">
 <button onclick="logout()">Logout</button>
+<button onclick="clearTable()">Clear</button>
+<label>
+  <input type="checkbox" id="todayMode">
+  Tänään-moodi
+</label>
+</div>
 
 <script src="app.js"></script>
 
