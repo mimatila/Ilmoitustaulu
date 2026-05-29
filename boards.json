@@ -1,40 +1,28 @@
 {
   "Mika": {
-    "password": "1",
+    "boardPassword": "1",
     "owner": "Opa",
+    "ownerPassword": "2",
     "members": [
-      "Opa"
+      "Opa",
+      "he",
+      "hello"
     ],
     "messages": [
       {
         "author": "Opa",
-        "time": "5/27/2026, 4:55:23 PM",
-        "text": "mitäs tänne eilen"
+        "time": "2026-05-29T18:00:02.020Z",
+        "text": "terve"
       },
       {
         "author": "Opa",
-        "time": "5/28/2026, 4:55:23 PM",
-        "text": "mitäs tänne"
+        "time": "2026-05-29T18:00:04.098Z",
+        "text": "her"
       },
       {
-        "author": "Opa",
-        "time": "2026-05-28T14:27:52.793Z",
-        "text": "heu"
-      },
-      {
-        "author": "Opa",
-        "time": "2026-05-28T15:07:44.724Z",
-        "text": "hey"
-      },
-      {
-        "author": "Opa",
-        "time": "2026-05-28T15:30:27.634Z",
-        "text": "hyvin toimii"
-      },
-      {
-        "author": "Opa",
-        "time": "2026-05-28T15:32:27.395Z",
-        "text": "kiitos paljon"
+        "author": "he",
+        "time": "2026-05-29T18:00:12.044Z",
+        "text": "l"
       }
     ]
   }

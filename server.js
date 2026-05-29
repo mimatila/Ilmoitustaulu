@@ -1,7 +1,6 @@
 const express = require("express");
 const fs = require("fs");
 const cors = require("cors");
-const ADMIN_PASSWORD = "1234";
 
 const app = express();
 
@@ -21,7 +20,7 @@ app.post("/login", (req, res) => {
 
   //console.log("REQ BODY:", req.body);
 
-  const { name, password, user } = req.body;
+  const { name, boardPassword, user } = req.body;
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
@@ -32,7 +31,7 @@ app.post("/login", (req, res) => {
     });
   }
 
-  if (data[name].password !== password) {
+  if (data[name].boardPassword !== boardPassword) {
     return res.status(401).json({
       success: false,
       message: "Väärä salasana"
@@ -56,15 +55,8 @@ app.post("/login", (req, res) => {
 
 app.post("/create", (req, res) => {
 
-  const { name, password, username, adminPassword } = req.body;
+  const { name, boardPassword, username, ownerPassword } = req.body;
   console.log(req.body);
-  // 🔥 tarkista admin salasana
-  if (adminPassword !== ADMIN_PASSWORD) {
-    return res.status(401).json({
-      success: false,
-      message: "Ei oikeuksia luoda taulua"
-    });
-  }
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
@@ -81,9 +73,10 @@ app.post("/create", (req, res) => {
   messages: []
   };*/
 
-  data[name] = {
-  password,
+ data[name] = {
+  boardPassword,
   owner: username,
+  ownerPassword,
   members: [username],
   messages: []
 };
@@ -100,7 +93,7 @@ app.post("/create", (req, res) => {
 app.delete("/delete/:name", (req, res) => {
 
   const name = req.params.name;
-  const { password } = req.body;
+  const { ownerPassword } = req.body;
 
   const data = JSON.parse(
     fs.readFileSync(FILE, "utf8")
@@ -115,7 +108,7 @@ app.delete("/delete/:name", (req, res) => {
   }
 
   // tarkista salasana
-  if (data[name].password !== password) {
+  if (data[name].ownerPassword !== ownerPassword) {
     return res.status(401).json({
     success: false,
     message: "Väärä salasana"
@@ -135,7 +128,7 @@ app.delete("/delete/:name", (req, res) => {
 
 app.post("/message", (req, res) => {
 
-  const { name, password, message, user } = req.body;
+  const { name, boardPassword, message, user } = req.body;
 
   const data = JSON.parse(
     fs.readFileSync(FILE, "utf8")
@@ -148,7 +141,7 @@ app.post("/message", (req, res) => {
     });
   }
 
-  if (data[name].password !== password) {
+  if (data[name].boardPassword !== boardPassword) {
     return res.status(401).json({
       success: false,
       message: "Väärä salasana"
@@ -200,20 +193,10 @@ app.get("/boards", (req, res) => {
 
 app.delete("/clear/:name", (req, res) => {
 
-  const data = JSON.parse(
-    fs.readFileSync(FILE, "utf8")
-  );
-
-  const { adminPassword } = req.body;
-
-  if (adminPassword !== ADMIN_PASSWORD) {
-    return res.status(403).json({
-      success: false,
-      message: "Väärä admin-salasana"
-    });
-  }
-
+  const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
   const board = data[req.params.name];
+
+  const { ownerPassword, username } = req.body;
 
   if (!board) {
     return res.status(404).json({
@@ -222,20 +205,25 @@ app.delete("/clear/:name", (req, res) => {
     });
   }
 
-  // 🔥 tyhjennä viestit
+  // 🔥 TÄRKEIN TARKISTUS
+  if (
+    board.owner !== username ||
+    board.ownerPassword !== ownerPassword
+  ) {
+    return res.status(403).json({
+      success: false,
+      message: "Ei oikeuksia (ei owner)"
+    });
+  }
+
   board.messages = [];
 
-  // 🔥 tallenna JSONiin
-  fs.writeFileSync(
-    FILE,
-    JSON.stringify(data, null, 2)
-  );
+  fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 
   res.json({
     success: true,
     message: "Viestit tyhjennetty"
   });
-
 });
 
 app.listen(3000, () => {
