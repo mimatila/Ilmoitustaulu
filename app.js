@@ -1,20 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   initApp();
-
 });
-
 
 // =====================
 // APP INIT
 // =====================
 
 function initApp() {
-
   bindUI();
   autoLoginFill();
-  
- 
+
+  if (document.getElementById("message")) {
+    initBoard();
+  }
+
 }
 
 
@@ -102,26 +101,21 @@ function autoLoginFill() {
 // BOARD INIT
 // =====================
 
+
 function initBoard() {
 
   const name = getBoardName();
 
-  if (!name) {
-    setTimeout(initBoard, 50);
-    return;
-  }
-
   const boardNameEl = document.getElementById("boardName");
   const box = document.getElementById("message");
 
-  console.log("INIT BOARD:", getBoardName());
-  console.log("LOAD MESSAGE BOARD:", name);
-
-  if (!boardNameEl || !box) return;
+  if (!boardNameEl || !box || !name) return;
 
   boardNameEl.innerText = name;
 
+  setTimeout(() => {
   loadMessage(true);
+}, 200);
 }
 
 
@@ -130,12 +124,7 @@ function initBoard() {
 // LOAD MESSAGES
 // =====================
 
-let controller;
-
 function loadMessage(forceScroll = false) {
-
-  if (controller) controller.abort();
-  controller = new AbortController();
 
   const box = document.getElementById("message");
  
@@ -144,9 +133,7 @@ function loadMessage(forceScroll = false) {
   const name = getBoardName();
   if (!name) return;
 
-  fetch(`http://localhost:3000/board/${name}`, {
-    signal: controller.signal
-  })
+  fetch(`http://localhost:3000/board/${name}`)
   .then(res => res.json())
   .then(data => {
 
@@ -170,10 +157,7 @@ function loadMessage(forceScroll = false) {
       box.scrollTop = box.scrollHeight;
     }
   })
-  .catch(err => {
-    if (err.name === "AbortError") return;
-      console.error(err);
-  });
+  
 }
 
 
@@ -234,6 +218,7 @@ function loginBoard() {
     localStorage.setItem("loggedIn", "true");
 
     window.location.href = "board.html";
+    
   });
 }
 
@@ -356,18 +341,4 @@ function logout() {
   localStorage.clear();
   window.location.href = "index.html";
 }
-
-window.addEventListener("load", () => {
-  initBoard();
-});
-
-
-
-
-
-
- 
-
-
-
 

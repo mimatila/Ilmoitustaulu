@@ -22,6 +22,8 @@ app.post("/login", (req, res) => {
 
   const { name, boardPassword, user } = req.body;
 
+  console.log("USER HERE:", user);
+
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
   if (!data[name]) {
