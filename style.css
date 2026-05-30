@@ -76,6 +76,6 @@ button {
   margin: 0 auto;   /* 🔥 keskittää vaakasuunnassa */
 }
 
-#boardsNewMsg {
+#boardNewMsg {
   flex: 1;
 }
