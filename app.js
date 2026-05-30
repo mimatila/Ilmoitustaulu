@@ -1,4 +1,22 @@
+let loading = false;
+let refreshInterval = null;
+
 document.addEventListener("DOMContentLoaded", () => {
+  const el = document.getElementById("boardCount");
+
+  if (el) {
+    el.innerText = "Ladataan...";
+
+    fetch("http://localhost:3000/boards/count")
+      .then(res => res.json())
+      .then(data => {
+        el.innerText = `Tauluja: ${data.count ?? 0}`;
+      })
+      .catch(() => {
+        el.innerText = "Tauluja ei saatu";
+      });
+  }
+
   initApp();
 });
 
@@ -49,10 +67,11 @@ function bindUI() {
     });
   }
 
-  const todayMode = document.getElementById("todayMode");
-  if (todayMode) {
-    todayMode.addEventListener("change", () => loadMessage());
+  document.addEventListener("change", (e) => {
+  if (e.target?.id === "todayMode") {
+    loadMessage(true);
   }
+});
 }
 
 
@@ -113,9 +132,28 @@ function initBoard() {
 
   boardNameEl.innerText = name;
 
+  loadMessage(true);
+
+  if (refreshInterval) clearInterval(refreshInterval);
+
+// eka lataus heti
+if (!document.hidden) {
+  loadMessage(false);
+}
+
+// automaattipäivitys
+refreshInterval = setInterval(() => {
+  console.log("REFRESH TICK");
+  if (!document.hidden) {
+    loadMessage(false);
+  }
+}, 5000);
+
+/*
   setTimeout(() => {
   loadMessage(true);
-}, 200);
+}, 200);*/
+
 }
 
 
@@ -127,37 +165,58 @@ function initBoard() {
 function loadMessage(forceScroll = false) {
 
   const box = document.getElementById("message");
- 
   if (!box) return;
 
+  if (loading) return;
+  loading = true;
+
+  console.log("checkbox state:", document.getElementById("todayMode")?.checked);
+
   const name = getBoardName();
-  if (!name) return;
+  if (!name) {
+    loading = false;
+    return;
+  }
 
   fetch(`http://localhost:3000/board/${name}`)
-  .then(res => res.json())
-  .then(data => {
+    .then(res => res.json())
+    .then(data => {
 
-    const isAtBottom =
-      box.scrollTop + box.clientHeight >= box.scrollHeight - 10;
+      const isAtBottom =
+        box.scrollTop + box.clientHeight >= box.scrollHeight - 10;
 
-    box.innerHTML = "";
+      box.innerHTML = "";
 
-    (data.messages || []).forEach(msg => {
-      const div = document.createElement("div");
+      (data.messages || []).forEach(msg => {
+        const div = document.createElement("div");
 
-      const date = new Date(msg.time);
+        const date = new Date(msg.time);
+        const now = new Date();
 
-      div.innerText =
-        `${date.toLocaleString()} - ${msg.author}: ${msg.text}`;
+        const isToday =
+          date.getDate() === now.getDate() &&
+          date.getMonth() === now.getMonth() &&
+          date.getFullYear() === now.getFullYear();
 
-      box.appendChild(div);
+        const todayMode = document.getElementById("todayMode")?.checked;
+
+        if (todayMode && isToday) {
+          div.innerText = `Tänään: ${msg.author}: ${msg.text}`;
+        } else {
+          div.innerText = `${date.toLocaleString()} - ${msg.author}: ${msg.text}`;
+        }
+
+        box.appendChild(div);
+      });
+
+      if (forceScroll || isAtBottom) {
+        box.scrollTop = box.scrollHeight;
+      }
+    })
+    .catch(console.error)
+    .finally(() => {
+      loading = false;
     });
-
-    if (forceScroll || isAtBottom) {
-      box.scrollTop = box.scrollHeight;
-    }
-  })
-  
 }
 
 
@@ -341,4 +400,10 @@ function logout() {
   localStorage.clear();
   window.location.href = "index.html";
 }
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    loadMessage(false);
+  }
+});
 

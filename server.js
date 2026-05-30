@@ -174,6 +174,8 @@ app.get("/favicon.ico", (req, res) => {
 
 app.get("/board/:name", (req, res) => {
 
+  console.log("GET BOARD:", req.params.name);
+
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
   const board = data[req.params.name];
@@ -226,6 +228,16 @@ app.delete("/clear/:name", (req, res) => {
     success: true,
     message: "Viestit tyhjennetty"
   });
+});
+
+app.get("/boards/count", (req, res) => {
+  const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
+
+  const count = Object.keys(data).length;
+
+  console.log("COUNT:", count);
+
+  res.json({ count });
 });
 
 app.listen(3000, () => {
