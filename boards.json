@@ -7,5 +7,14 @@
       "Opa"
     ],
     "messages": []
+  },
+  "Mika": {
+    "boardPassword": "1",
+    "owner": "Opa",
+    "ownerPassword": "2",
+    "members": [
+      "Opa"
+    ],
+    "messages": []
   }
 }

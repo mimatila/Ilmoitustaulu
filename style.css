@@ -38,34 +38,25 @@ button {
   overflow-y: auto;
   overflow-x: auto;
   display: block;
-
   font-family: monospace;
   text-align: left;
-
   padding: 12px;
-
   border: 1px solid #ccc;
   border-radius: 10px;
-
   background: #f7f7f7;
-
   font-size: 12px;
-
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 #message div {
   margin: 6px 0;
   padding: 8px 10px;
-
   white-space: normal;
   overflow-wrap: break-word;
-
   background: #ffffff;
   border-radius: 10px;
   border: 1px solid #e0e0e0;
   max-width: 90%;
-
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
@@ -77,7 +68,7 @@ button {
   margin: 0 auto;   /* 🔥 keskittää vaakasuunnassa */
 }
 
-.output-row {
+.button-row {
   display: flex;
   gap: 10px;
   align-items: center;
