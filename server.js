@@ -20,9 +20,9 @@ app.post("/login", (req, res) => {
 
   //console.log("REQ BODY:", req.body);
 
-  const { name, boardPassword, user } = req.body;
+  const { name, boardPassword, username } = req.body;
 
-  console.log("USER HERE:", user);
+  console.log("USER HERE:", username);
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
@@ -40,8 +40,8 @@ app.post("/login", (req, res) => {
     });
   }
 
-  if (!data[name].members.includes(user)&&user!=null&&user!="") {
-  data[name].members.push(user);
+  if (!data[name].members.includes(username)&&username!=null&&username!="") {
+  data[name].members.push(username);
 
   console.log("MEMBERS HERE:", data[name].members);
 

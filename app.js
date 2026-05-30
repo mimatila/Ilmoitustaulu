@@ -125,7 +125,7 @@ function initBoard() {
 
   const name = getBoardName();
 
-  const boardNameEl = document.getElementById("boardName");
+  const boardNameEl = document.getElementById("boardTitle");
   const box = document.getElementById("message");
 
   if (!boardNameEl || !box || !name) return;
@@ -264,7 +264,7 @@ function loginBoard() {
   fetch("http://localhost:3000/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, boardPassword, user: username })
+    body: JSON.stringify({ name, boardPassword, username })
   })
   .then(res => res.json())
   .then(data => {

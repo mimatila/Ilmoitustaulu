@@ -1,24 +1,4 @@
 {
-  "Mika": {
-    "boardPassword": "1",
-    "owner": "Opa",
-    "ownerPassword": "2",
-    "members": [
-      "Opa"
-    ],
-    "messages": [
-      {
-        "author": "Opa",
-        "time": "2026-05-30T08:46:15.279Z",
-        "text": "hey"
-      },
-      {
-        "author": "Opa",
-        "time": "2026-05-30T08:49:55.993Z",
-        "text": "joo"
-      }
-    ]
-  },
   "Pena": {
     "boardPassword": "1",
     "owner": "Opa",
