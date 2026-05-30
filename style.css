@@ -29,7 +29,7 @@ button {
   padding: 10px;
 }
 
-#message {
+#boardMessage {
   height: 200px;
   max-width: 550px;
   width: 100%;
@@ -48,7 +48,7 @@ button {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-#message div {
+#boardMessage div {
   margin: 6px 0;
   padding: 8px 10px;
   white-space: normal;
@@ -76,6 +76,6 @@ button {
   margin: 0 auto;   /* 🔥 keskittää vaakasuunnassa */
 }
 
-#newMsg {
+#boardsNewMsg {
   flex: 1;
 }

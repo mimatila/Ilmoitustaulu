@@ -20,30 +20,30 @@ app.post("/login", (req, res) => {
 
   //console.log("REQ BODY:", req.body);
 
-  const { name, boardPassword, username } = req.body;
-
-  console.log("USER HERE:", username);
+  const { boardName, boardPassword, boardUsername } = req.body;
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
-  if (!data[name]) {
+  if (!data[boardName]) {
     return res.status(404).json({
       success: false,
       message: "Taulua ei löydy"
     });
   }
 
-  if (data[name].boardPassword !== boardPassword) {
+  if (data[boardName].boardPassword !== boardPassword) {
     return res.status(401).json({
       success: false,
       message: "Väärä salasana"
     });
   }
 
-  if (!data[name].members.includes(username)&&username!=null&&username!="") {
-  data[name].members.push(username);
-
-  console.log("MEMBERS HERE:", data[name].members);
+  if (
+  boardUsername &&
+  Array.isArray(data[boardName].members) &&
+  !data[boardName].members.includes(boardUsername)
+) {
+  data[boardName].members.push(boardUsername);
 
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 }
@@ -57,12 +57,12 @@ app.post("/login", (req, res) => {
 
 app.post("/create", (req, res) => {
 
-  const { name, boardPassword, username, ownerPassword } = req.body;
+  const { boardName, boardPassword, boardUsername, ownerPassword } = req.body;
   console.log(req.body);
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
-  if (data[name]) {
+  if (data[boardName]) {
     return res.status(400).json({
       success: false,
       message: "Taulu on jo olemassa"
@@ -70,17 +70,17 @@ app.post("/create", (req, res) => {
   }
 
   /*
-  data[name] = {
+  data[boardName] = {
   password,
   messages: []
   };*/
 
- data[name] = {
+ data[boardName] = {
   boardPassword,
-  owner: username,
+  owner: boardUsername,
   ownerPassword,
-  members: [username],
-  messages: []
+  members: [boardUsername],
+  boardMessages: []
 };
 
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
@@ -92,9 +92,9 @@ app.post("/create", (req, res) => {
 
 });
 
-app.delete("/delete/:name", (req, res) => {
+app.delete("/delete/:boardName", (req, res) => {
 
-  const name = req.params.name;
+  const boardName = req.params.boardName;
   const { ownerPassword } = req.body;
 
   const data = JSON.parse(
@@ -102,7 +102,7 @@ app.delete("/delete/:name", (req, res) => {
   );
 
   // löytyykö taulu
-  if (!data[name]) {
+  if (!data[boardName]) {
     return res.status(404).json({
     success: false,
     message: "Taulua ei löytynyt"
@@ -110,14 +110,14 @@ app.delete("/delete/:name", (req, res) => {
   }
 
   // tarkista salasana
-  if (data[name].ownerPassword !== ownerPassword) {
+  if (data[boardName].ownerPassword !== ownerPassword) {
     return res.status(401).json({
     success: false,
     message: "Väärä salasana"
   });
   }
 
-  delete data[name];
+  delete data[boardName];
 
   fs.writeFileSync(
     FILE,
@@ -128,22 +128,22 @@ app.delete("/delete/:name", (req, res) => {
 
 });
 
-app.post("/message", (req, res) => {
-
-  const { name, boardPassword, message, user } = req.body;
+app.post("/boardMessage", (req, res) => {
+  console.log("wittu", req.body);
+  const { boardName, boardPassword, boardMessage, boardUsername } = req.body;
 
   const data = JSON.parse(
     fs.readFileSync(FILE, "utf8")
   );
 
-  if (!data[name]) {
+  if (!data[boardName]) {
     return res.status(404).json({
       success: false,
       message: "Taulua ei löydy"
     });
   }
 
-  if (data[name].boardPassword !== boardPassword) {
+  if (data[boardName].boardPassword !== boardPassword) {
     return res.status(401).json({
       success: false,
       message: "Väärä salasana"
@@ -151,12 +151,12 @@ app.post("/message", (req, res) => {
   }
 
   // 🔥 TÄMÄ PITÄÄ OLLA ENNEN RESPONSEA
-  //data[name].messages.push(message);
+  //data[boardName].messages.push(message);
 
-  data[name].messages.push({
-  author: user,
+  data[boardName].boardMessages.push({
+  author: boardUsername,
   time: new Date().toISOString(),
-  text: message
+  text: boardMessage
   });
 
   fs.writeFileSync(
@@ -172,13 +172,11 @@ app.get("/favicon.ico", (req, res) => {
   res.status(204).end();
 });
 
-app.get("/board/:name", (req, res) => {
-
-  console.log("GET BOARD:", req.params.name);
+app.get("/board/:boardName", (req, res) => {
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
 
-  const board = data[req.params.name];
+  const board = data[req.params.boardName];
 
   if (!board) {
     return res.status(404).json({
@@ -195,12 +193,12 @@ app.get("/boards", (req, res) => {
   res.json(data);
 });
 
-app.delete("/clear/:name", (req, res) => {
+app.delete("/clear/:boardName", (req, res) => {
 
   const data = JSON.parse(fs.readFileSync(FILE, "utf8"));
-  const board = data[req.params.name];
+  const board = data[req.params.boardName];
 
-  const { ownerPassword, username } = req.body;
+  const { ownerPassword, boardUsername } = req.body;
 
   if (!board) {
     return res.status(404).json({
@@ -211,8 +209,8 @@ app.delete("/clear/:name", (req, res) => {
 
   // 🔥 TÄRKEIN TARKISTUS
   if (
-    board.owner !== username ||
-    board.ownerPassword !== ownerPassword
+    board.owner !== boardUsername ||
+    ownerPassword !== ownerPassword
   ) {
     return res.status(403).json({
       success: false,
@@ -220,7 +218,7 @@ app.delete("/clear/:name", (req, res) => {
     });
   }
 
-  board.messages = [];
+  board.boardMessages = [];
 
   fs.writeFileSync(FILE, JSON.stringify(data, null, 2));
 

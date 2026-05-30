@@ -28,7 +28,7 @@ function initApp() {
   bindUI();
   autoLoginFill();
 
-  if (document.getElementById("message")) {
+  if (document.getElementById("boardMessages")) {
     initBoard();
   }
 
@@ -41,23 +41,10 @@ function initApp() {
 
 function bindUI() {
 
-  const loginBtn = document.getElementById("ilmoitustaulu");
-  if (loginBtn) {
-    loginBtn.addEventListener("click", loginBoard);
-  }
-
-  document.addEventListener("keydown", (e) => {
-    // estää Enter bugit inputeissa
-    if (e.key === "Enter" && !isTypingField(e.target)) {
-      const btn = document.getElementById("ilmoitustaulu");
-      if (btn) btn.click();
-    }
-  });
-
   const homeBtn = document.getElementById("koti");
   if (homeBtn) homeBtn.addEventListener("click", koti);
 
-  const msgInput = document.getElementById("newMsg");
+  const msgInput = document.getElementById("boardNewMsg");
   if (msgInput) {
     msgInput.addEventListener("keydown", (e) => {
       if (e.key === "Enter") {
@@ -94,14 +81,14 @@ function getBoardName() {
 
 function autoLoginFill() {
 
-  const name = localStorage.getItem("boardName") || "";
+  const boardName = localStorage.getItem("boardName") || "";
   const boardPassword = localStorage.getItem("boardPassword") || "";
-  const username = localStorage.getItem("username") || "";
+  const boardUsername = localStorage.getItem("boardUsername") || "";
 
   const loggedIn = localStorage.getItem("loggedIn");
   const skip = sessionStorage.getItem("skipAutoLogin");
 
-  const nameInput = document.getElementById("name");
+  const nameInput = document.getElementById("boardName");
 
   if (!nameInput) return;
 
@@ -110,9 +97,9 @@ function autoLoginFill() {
     return;
   }
 
-  nameInput.value = name;
-  document.getElementById("password").value = boardPassword;
-  document.getElementById("username").value = username;
+  nameInput.value = boardName;
+  document.getElementById("boardPassword").value = boardPassword;
+  document.getElementById("boardUsername").value = boardUsername;
 }
 
 
@@ -123,27 +110,20 @@ function autoLoginFill() {
 
 function initBoard() {
 
-  const name = getBoardName();
+  const boardName = getBoardName();
 
   const boardNameEl = document.getElementById("boardTitle");
-  const box = document.getElementById("message");
+  const box = document.getElementById("boardMessages");
 
-  if (!boardNameEl || !box || !name) return;
+  if (!boardNameEl || !box || !boardName) return;
 
-  boardNameEl.innerText = name;
+  boardNameEl.innerText = boardName;
 
   loadMessage(true);
 
-  if (refreshInterval) clearInterval(refreshInterval);
+if (refreshInterval) clearInterval(refreshInterval);
 
-// eka lataus heti
-if (!document.hidden) {
-  loadMessage(false);
-}
-
-// automaattipäivitys
 refreshInterval = setInterval(() => {
-  console.log("REFRESH TICK");
   if (!document.hidden) {
     loadMessage(false);
   }
@@ -164,7 +144,7 @@ refreshInterval = setInterval(() => {
 
 function loadMessage(forceScroll = false) {
 
-  const box = document.getElementById("message");
+  const box = document.getElementById("boardMessage");
   if (!box) return;
 
   if (loading) return;
@@ -172,13 +152,13 @@ function loadMessage(forceScroll = false) {
 
   console.log("checkbox state:", document.getElementById("todayMode")?.checked);
 
-  const name = getBoardName();
-  if (!name) {
+  const boardName = getBoardName();
+  if (!boardName) {
     loading = false;
     return;
   }
 
-  fetch(`http://localhost:3000/board/${name}`)
+  fetch(`http://localhost:3000/board/${boardName}`)
     .then(res => res.json())
     .then(data => {
 
@@ -187,7 +167,7 @@ function loadMessage(forceScroll = false) {
 
       box.innerHTML = "";
 
-      (data.messages || []).forEach(msg => {
+      (data.boardMessages || []).forEach(msg => {
         const div = document.createElement("div");
 
         const date = new Date(msg.time);
@@ -226,24 +206,24 @@ function loadMessage(forceScroll = false) {
 
 function updateMessage() {
 
-  const messageEl = document.getElementById("newMsg");
+  const messageEl = document.getElementById("boardNewMsg");
   if (!messageEl) return;
 
-  const message = messageEl.value;
+  const boardMessage = messageEl.value;
 
-  const name = localStorage.getItem("boardName");
+  const boardName = localStorage.getItem("boardName");
   const boardPassword = localStorage.getItem("boardPassword");
-  const user = localStorage.getItem("username") || name;
+  const boardUsername = localStorage.getItem("boardUsername") || boardName;
 
-  fetch("http://localhost:3000/message", {
+  fetch("http://localhost:3000/boardMessage", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, boardPassword, message, user })
+    body: JSON.stringify({ boardName, boardPassword, boardMessage, boardUsername })
   })
   .then(res => res.json())
   .then(data => {
 
-    if (!data.success) return alert(data.message);
+    if (!data.success) return alert(data.boardMessage);
 
     messageEl.value = "";
     loadMessage(true);
@@ -257,23 +237,23 @@ function updateMessage() {
 
 function loginBoard() {
 
-  const name = document.getElementById("name").value;
-  const boardPassword = document.getElementById("password").value;
-  const username = document.getElementById("username").value;
+  const boardName = document.getElementById("boardName").value;
+  const boardPassword = document.getElementById("boardPassword").value;
+  const boardUsername = document.getElementById("boardUsername").value;
 
   fetch("http://localhost:3000/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ name, boardPassword, username })
+    body: JSON.stringify({ boardName, boardPassword, boardUsername })
   })
   .then(res => res.json())
   .then(data => {
 
     if (!data.success) return alert(data.message);
 
-    localStorage.setItem("boardName", name);
+    localStorage.setItem("boardName", boardName);
     localStorage.setItem("boardPassword", boardPassword);
-    localStorage.setItem("username", username);
+    localStorage.setItem("boardUsername", boardUsername);
     localStorage.setItem("loggedIn", "true");
 
     window.location.href = "board.html";
@@ -288,9 +268,9 @@ function loginBoard() {
 
 function createBoard() {
 
-  const name = document.getElementById("name").value;
-  const boardPassword = document.getElementById("password").value;
-  const username = document.getElementById("username").value;
+  const boardName = document.getElementById("boardName").value;
+  const boardPassword = document.getElementById("boardPassword").value;
+  const boardUsername = document.getElementById("boardUsername").value;
 
   const ownerPassword = prompt("Anna owner-salasana:");
 
@@ -303,10 +283,10 @@ function createBoard() {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
-      name,
+      boardName,
       boardPassword,
       ownerPassword,
-      username
+      boardUsername
     })
   })
   .then(res => res.json())
@@ -317,9 +297,9 @@ function createBoard() {
       return;
     }
 
-    localStorage.setItem("boardName", name);
+    localStorage.setItem("boardName", boardName);
     localStorage.setItem("boardPassword", boardPassword);
-    localStorage.setItem("username", username);
+    localStorage.setItem("boardUsername", boardUsername);
 
     alert(data.message);
   });
@@ -332,12 +312,12 @@ function createBoard() {
 
 function deleteBoard() {
 
-  const name = localStorage.getItem("boardName");
+  const boardName = localStorage.getItem("boardName");
   const ownerPassword = prompt("Anna owner-salasana:");
 
   if (!confirm("Haluatko varmasti poistaa taulun?")) return;
 
-  fetch(`http://localhost:3000/delete/${name}`, {
+  fetch(`http://localhost:3000/delete/${boardName}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ ownerPassword })
@@ -361,18 +341,18 @@ function deleteBoard() {
 
 function clearTable() {
 
-  const name = localStorage.getItem("boardName");
+  const boardName = localStorage.getItem("boardName");
   const ownerPassword = prompt("Anna owner-salasana:");
-  const username = localStorage.getItem("username");
+  const boardUsername = localStorage.getItem("boardUsername");
 
   if (!confirm("Tyhjennetäänkö kaikki viestit?")) return;
 
-  fetch(`http://localhost:3000/clear/${name}`, {
+  fetch(`http://localhost:3000/clear/${boardName}`, {
     method: "DELETE",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       ownerPassword,
-      username
+      boardUsername
     })
   })
   .then(res => res.json())
